@@ -68,7 +68,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-full fixed lg:w-72 xl:w-80 h-screen top-16 overflow-y-auto bg-black border-r border-gray-800 hidden md:block">
+    <aside className="w-full fixed custom-scrollbar lg:w-72 xl:w-80 h-screen top-16 overflow-y-auto bg-black border-r border-gray-800 hidden md:block">
       <div className="p-4 space-y-6">
         {/* Main Navigation */}
         <nav className="space-y-1">
