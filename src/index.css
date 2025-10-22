@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme{
+  --color-primary: #0D1117
+}
+
+body{
+  background-color: var(--color-primary);
+}
+
+--webkit-scrollbar {
+  width: 8px;
+}
