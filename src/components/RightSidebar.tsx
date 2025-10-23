@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react';
 import { Award, Clock, Code, MessageSquare, Calendar, Zap, BookOpen, Trophy, Target, TrendingUp } from 'lucide-react';
 
