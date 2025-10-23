@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Eye, EyeOff, Code2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { useState } from "react";
+import { Eye, EyeOff, Code2 } from "lucide-react";
+import { Link } from "react-router";
+import { useRegisterUserMutation } from "../services/userApi";
 
 interface FormData {
   fullName: string;
@@ -21,48 +22,58 @@ interface FormErrors {
 export default function Signup() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
-    fullName: '',
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [registerUser] = useRegisterUserMutation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
-    
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
-    else if (formData.username.length < 3) newErrors.username = 'Username must be at least 3 characters';
-    
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-    
+
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!formData.username.trim()) newErrors.username = "Username is required";
+    else if (formData.username.length < 3)
+      newErrors.username = "Username must be at least 3 characters";
+
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     return newErrors;
   };
 
   const handleSubmit = () => {
     const newErrors = validateForm();
-    
+
     if (Object.keys(newErrors).length === 0) {
-      console.log('Form submitted:', formData);
-      alert('Signup successful! (This is a demo)');
+      console.log("Form submitted:", formData);
+      const data = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      };
+      registerUser(data);
+      alert("Signup successful! (This is a demo)");
     } else {
       setErrors(newErrors);
     }
@@ -76,14 +87,20 @@ export default function Signup() {
           <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-yellow-400 rounded-lg mb-3 sm:mb-4">
             <Code2 className="w-8 h-8 sm:w-10 sm:h-10 text-black" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">JS Community</h1>
-          <p className="text-sm sm:text-base text-gray-400">Join the JavaScript developers community</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+            JS Community
+          </h1>
+          <p className="text-sm sm:text-base text-gray-400">
+            Join the JavaScript developers community
+          </p>
         </div>
 
         {/* Signup Form */}
         <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">Create Account</h2>
-          
+          <h2 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">
+            Create Account
+          </h2>
+
           <div className="space-y-3 sm:space-y-4">
             {/* Full Name */}
             <div>
@@ -95,7 +112,9 @@ export default function Signup() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${
+                  errors.fullName ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 placeholder="John Doe"
               />
               {errors.fullName && (
@@ -113,7 +132,9 @@ export default function Signup() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${
+                  errors.username ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 placeholder="johndoe"
               />
               {errors.username && (
@@ -131,7 +152,9 @@ export default function Signup() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 placeholder="john@example.com"
               />
               {errors.email && (
@@ -146,11 +169,13 @@ export default function Signup() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                   placeholder="••••••••"
                 />
                 <button
@@ -172,15 +197,19 @@ export default function Signup() {
                 Confirm Password
               </label>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border ${
+                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 placeholder="••••••••"
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
 
@@ -196,11 +225,11 @@ export default function Signup() {
           {/* Login Link */}
           <div className="mt-4 sm:mt-6 text-center">
             <p className="text-sm sm:text-base text-gray-600">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link to="/login">
-              <button className="text-yellow-500 font-semibold hover:text-yellow-600">
-                Log In
-              </button>
+                <button className="text-yellow-500 font-semibold hover:text-yellow-600">
+                  Log In
+                </button>
               </Link>
             </p>
           </div>

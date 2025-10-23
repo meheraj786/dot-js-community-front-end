@@ -6,22 +6,30 @@ export const userApi = api.injectEndpoints({
       query: () => "/users",
       providesTags: ["User"],
     }),
+
     getUserById: builder.query({
       query: (id) => `/users/${id}`,
       providesTags: ["User"],
     }),
-    addUser: builder.mutation({
-      query: (newUser) => ({
-        url: "/users",
+    loginUser: builder.mutation({
+      query: (userData) => ({
+        url: "/auth/login",
         method: "POST",
-        body: newUser,
+        body: userData,
+      }),
+    }),
+    registerUser: builder.mutation({
+      query: (userData) => ({
+        url: "/auth/register",
+        method: "POST",
+        body: userData,
       }),
       invalidatesTags: ["User"],
     }),
     updateUser: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/users/${id}`,
-        method: "PUT",
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["User"],
@@ -39,7 +47,8 @@ export const userApi = api.injectEndpoints({
 export const {
   useGetUsersQuery,
   useGetUserByIdQuery,
-  useAddUserMutation,
+  useRegisterUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  useLoginUserMutation
 } = userApi;

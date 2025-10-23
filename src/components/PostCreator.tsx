@@ -71,7 +71,6 @@ export default function PostCreator() {
     console.log("Post submitted:", post);
     alert("Post created successfully! (This is a demo)");
 
-    // Reset form
     setContent("");
     setTags("");
     setCodeBlocks([]);
