@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Calendar, Link as LinkIcon, Star, Code, MessageSquare, Heart, CheckCircle, Settings, Mail, MoreHorizontal, Bookmark } from 'lucide-react';
+import { MapPin, Calendar, Link as LinkIcon, Star, MessageSquare, Heart, CheckCircle, Settings, Mail, MoreHorizontal } from 'lucide-react';
 
 type TabType = 'posts' | 'answers' | 'saved' | 'codeblocks';
 
