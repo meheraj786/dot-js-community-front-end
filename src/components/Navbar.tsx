@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Code2, Home, Code, Users, Bell, Search, Menu, X, Plus, User, Settings, LogOut } from 'lucide-react';
+import { useLogoutUserMutation } from '../services/userApi';
 
 interface User {
   name: string;
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [notifications] = useState<number>(3);
+  const [logoutUser]=useLogoutUserMutation()
 
   // Dummy user data
   const currentUser: User = {
@@ -134,7 +136,7 @@ export default function Navbar() {
                     <span>Settings</span>
                   </a>
                   <hr className="my-2 border-gray-200" />
-                  <button className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full">
+                  <button onClick={logoutUser} className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full">
                     <LogOut size={16} />
                     <span>Logout</span>
                   </button>

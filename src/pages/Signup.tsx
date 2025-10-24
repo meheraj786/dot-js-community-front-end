@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Code2 } from "lucide-react";
 import { Link } from "react-router";
 import { useRegisterUserMutation } from "../services/userApi";
+import toast, { Toaster } from "react-hot-toast";
 
 interface FormData {
   fullName: string;
@@ -73,7 +74,7 @@ export default function Signup() {
         password: formData.password,
       };
       registerUser(data);
-      alert("Signup successful! (This is a demo)");
+      toast.success("Signup successful!");
     } else {
       setErrors(newErrors);
     }
@@ -81,6 +82,7 @@ export default function Signup() {
 
   return (
     <div className=" bg-black flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <Toaster position="top-right" />
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-6 sm:mb-8">
