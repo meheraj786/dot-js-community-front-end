@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Code2, Home, Code, Users, Bell, Search, Menu, X, Plus, User, Settings, LogOut } from 'lucide-react';
 import { useLogoutUserMutation } from '../services/userApi';
+import { Link } from 'react-router';
 
 interface User {
   name: string;
@@ -127,10 +128,10 @@ export default function Navbar() {
                     <p className="text-sm font-semibold text-black">{currentUser.name}</p>
                     <p className="text-xs text-gray-500">{currentUser.username}</p>
                   </div>
-                  <a href="#profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                  <Link to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
                     <User size={16} />
                     <span>Profile</span>
-                  </a>
+                  </Link>
                   <a href="#settings" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
                     <Settings size={16} />
                     <span>Settings</span>

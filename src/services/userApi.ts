@@ -6,6 +6,9 @@ export const userApi = api.injectEndpoints({
       query: () => "/users",
       providesTags: ["User"],
     }),
+    getUser: builder.query({
+      query: () => "/auth/get-user",
+    }),
 
     getUserById: builder.query({
       query: (id) => `/users/${id}`,
@@ -58,4 +61,5 @@ export const {
   useUpdateUserMutation,
   useDeleteUserMutation,
   useLoginUserMutation,
+  useGetUserQuery
 } = userApi;
