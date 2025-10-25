@@ -1,7 +1,20 @@
-import { useState } from 'react';
-import { Code2, Home, Code, Users, Bell, Search, Menu, X, Plus, User, Settings, LogOut } from 'lucide-react';
-import { useLogoutUserMutation } from '../services/userApi';
-import { Link } from 'react-router';
+import { useState } from "react";
+import {
+  Code2,
+  Home,
+  Code,
+  Users,
+  Bell,
+  Search,
+  Menu,
+  X,
+  Plus,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import { useLogoutUserMutation } from "../services/userApi";
+import { Link, NavLink } from "react-router";
 
 interface User {
   name: string;
@@ -13,21 +26,21 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [notifications] = useState<number>(3);
-  const [logoutUser]=useLogoutUserMutation()
+  const [logoutUser] = useLogoutUserMutation();
 
   // Dummy user data
   const currentUser: User = {
-    name: 'John Doe',
-    username: '@johndoe',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John'
+    name: "John Doe",
+    username: "@johndoe",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   };
 
   const navItems = [
-    { icon: Home, label: 'Home', href: '#home', active: true },
-    { icon: Code, label: 'Code Blocks', href: '#code', active: false },
-    { icon: Users, label: 'Community', href: '#community', active: false },
+    { icon: Home, label: "Home", href: "/" },
+    { icon: Code, label: "Code Blocks", href: "/code" },
+    { icon: Users, label: "Community", href: "/community" },
   ];
 
   return (
@@ -48,25 +61,28 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <a
+              <NavLink
                 key={item.label}
-                href={item.href}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-                  item.active
-                    ? 'bg-yellow-400 text-black font-semibold'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
+                to={item.href}
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-yellow-400 flex items-center gap-2 px-4 py-2 rounded-lg transition text-black font-semibold"
+                    : "text-gray-300 flex items-center gap-2 px-4 py-2 rounded-lg transition hover:bg-gray-800 hover:text-white"
+                }
               >
                 <item.icon size={18} />
                 <span>{item.label}</span>
-              </a>
+              </NavLink>
             ))}
           </div>
 
           {/* Search Bar - Desktop */}
           <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Search posts, users..."
@@ -125,19 +141,32 @@ export default function Navbar() {
               {profileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2">
                   <div className="px-4 py-3 border-b border-gray-200">
-                    <p className="text-sm font-semibold text-black">{currentUser.name}</p>
-                    <p className="text-xs text-gray-500">{currentUser.username}</p>
+                    <p className="text-sm font-semibold text-black">
+                      {currentUser.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {currentUser.username}
+                    </p>
                   </div>
-                  <Link to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  >
                     <User size={16} />
                     <span>Profile</span>
                   </Link>
-                  <a href="#settings" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                  <a
+                    href="#settings"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  >
                     <Settings size={16} />
                     <span>Settings</span>
                   </a>
                   <hr className="my-2 border-gray-200" />
-                  <button onClick={logoutUser} className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full">
+                  <button
+                    onClick={logoutUser}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full"
+                  >
                     <LogOut size={16} />
                     <span>Logout</span>
                   </button>
@@ -159,7 +188,10 @@ export default function Navbar() {
         {searchOpen && (
           <div className="lg:hidden py-3 border-t border-gray-800">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Search posts, users..."
@@ -181,8 +213,8 @@ export default function Navbar() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     item.active
-                      ? 'bg-yellow-400 text-black font-semibold'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? "bg-yellow-400 text-black font-semibold"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
                 >
                   <item.icon size={20} />

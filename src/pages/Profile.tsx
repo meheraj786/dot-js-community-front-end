@@ -23,7 +23,6 @@ export default function ProfilePage() {
   const { data: userData, error: userError, isLoading: userLoading } = useGetUserQuery();
   const { data: postsData, error: postsError, isLoading: postsLoading } = useGetPostsQuery();
 
-  // User data theke profile banano
   const userProfile = userData?.data ? {
     id: userData.data._id,
     name: userData.data.name || "User",
@@ -31,7 +30,7 @@ export default function ProfilePage() {
     avatar: userData.data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.data.name}`,
     banner: "https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=300&fit=crop",
     bio: "Full-stack developer | React enthusiast | Building amazing web experiences ✨",
-    location: "San Francisco, CA",
+    location: userData?.location || "Unknown",
     website: "",
     joinedDate: userData.data.createdAt,
     verified: false,
@@ -43,12 +42,10 @@ export default function ProfilePage() {
     },
   } : null;
 
-  // Posts filter kore current user er posts newa
   const userPosts = postsData && userData?.data ? 
     postsData.filter(post => post.author?._id === userData.data._id || post.author === userData.data._id)
     : [];
 
-  // Update stats with actual post count
   if (userProfile) {
     userProfile.stats.posts = userPosts.length;
   }
@@ -83,7 +80,6 @@ export default function ProfilePage() {
     return date.toLocaleDateString();
   };
 
-  // Loading state
   if (userLoading || postsLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -92,7 +88,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Error state
   if (userError || !userProfile) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">

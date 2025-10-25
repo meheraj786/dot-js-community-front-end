@@ -1,7 +1,20 @@
-import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Code, CheckCircle } from 'lucide-react';
+import { useState } from "react";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
+  Code,
+  CheckCircle,
+} from "lucide-react";
+import {
+  useIsLikedQuery,
+  useLikePostMutation,
+  useLikesCountQuery,
+} from "../services/postApi";
 
-type PostType = 'thought' | 'question';
+type PostType = "thought" | "question";
 
 interface User {
   _id: string;
@@ -46,31 +59,37 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [saved, setSaved] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
   const [showCodeBlock, setShowCodeBlock] = useState<boolean>(false);
+  const [likePost] = useLikePostMutation();
+  const { data, error, isLoading, isError } = useLikesCountQuery(post?._id);
+  const {
+    data: isLiked,
+    error: likedErr,
+    isLoading: isLoadingLiked,
+    isError: isLikedErr,
+  } = useIsLikedQuery(post?._id);
 
   const handleLike = () => {
-    if (liked) {
-      setLikeCount(likeCount - 1);
-    } else {
-      setLikeCount(likeCount + 1);
-    }
-    setLiked(!liked);
+    likePost(post?._id);
   };
+  console.log(data, "Likes count");
 
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800)
+      return `${Math.floor(diffInSeconds / 86400)}d ago`;
     return date.toLocaleDateString();
   };
 
   const formatNumber = (num: number): string => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
     return num.toString();
   };
 
@@ -79,7 +98,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.username}`;
   };
 
-  const isAnswered = post.type === 'question' && post.comments.length > 0;
+  const isAnswered = post.type === "question" && post.comments.length > 0;
 
   return (
     <article className="bg-gray-900 rounded-xl border border-gray-800 hover:border-gray-700 transition-all">
@@ -93,25 +112,34 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             />
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-sm sm:text-base">{post.author.name}</h3>
+                <h3 className="font-bold text-white text-sm sm:text-base">
+                  {post.author.name}
+                </h3>
                 {post.author.verified && (
-                  <CheckCircle className="text-yellow-400 fill-yellow-400" size={16} />
+                  <CheckCircle
+                    className="text-yellow-400 fill-yellow-400"
+                    size={16}
+                  />
                 )}
               </div>
-              <p className="text-xs sm:text-sm text-gray-400">{post.author.username}</p>
-              <p className="text-xs text-gray-500">{formatTime(post.createdAt)}</p>
+              <p className="text-xs sm:text-sm text-gray-400">
+                {post.author.username}
+              </p>
+              <p className="text-xs text-gray-500">
+                {formatTime(post.createdAt)}
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <span
               className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
-                post.type === 'question'
-                  ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30'
-                  : 'bg-gray-800 text-gray-300 border border-gray-700'
+                post.type === "question"
+                  ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30"
+                  : "bg-gray-800 text-gray-300 border border-gray-700"
               }`}
             >
-              {post.type === 'question' ? '❓ Question' : '💭 Thought'}
+              {post.type === "question" ? "❓ Question" : "💭 Thought"}
             </span>
 
             {isAnswered && (
@@ -162,7 +190,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition text-xs sm:text-sm font-medium border border-gray-700"
             >
               <Code size={16} />
-              <span>{showCodeBlock ? 'Hide' : 'View'} Code Block</span>
+              <span>{showCodeBlock ? "Hide" : "View"} Code Block</span>
             </button>
 
             {showCodeBlock && (
@@ -172,8 +200,10 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                     <span className="text-yellow-400 text-xs font-semibold uppercase">
                       Code
                     </span>
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(post.codeBlock || '')}
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(post.codeBlock || "")
+                      }
                       className="text-gray-500 hover:text-yellow-400 text-xs transition"
                     >
                       Copy
@@ -193,16 +223,15 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             <button
               onClick={handleLike}
               className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg transition ${
-                liked
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'hover:bg-gray-800 text-gray-400'
+                isLiked?.isLiked
+                  ? "bg-red-500/20 text-red-400"
+                  : "hover:bg-gray-800 text-gray-400"
               }`}
             >
-              <Heart
-                size={18}
-                className={liked ? 'fill-red-400' : ''}
-              />
-              <span className="text-xs sm:text-sm font-medium">{formatNumber(likeCount)}</span>
+              <Heart size={18} className={liked ? "fill-red-400" : ""} />
+              <span className="text-xs sm:text-sm font-medium">
+                {isLoading ? "..." : data?.likesCount ?? 0}
+              </span>
             </button>
 
             <button
@@ -210,12 +239,16 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-800 text-gray-400 transition"
             >
               <MessageCircle size={18} />
-              <span className="text-xs sm:text-sm font-medium">{formatNumber(post.comments.length)}</span>
+              <span className="text-xs sm:text-sm font-medium">
+                {formatNumber(post.comments.length)}
+              </span>
             </button>
 
             <button className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-800 text-gray-400 transition">
               <Share2 size={18} />
-              <span className="text-xs sm:text-sm font-medium hidden sm:inline">Share</span>
+              <span className="text-xs sm:text-sm font-medium hidden sm:inline">
+                Share
+              </span>
             </button>
           </div>
 
@@ -223,21 +256,19 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             onClick={() => setSaved(!saved)}
             className={`p-2 rounded-lg transition ${
               saved
-                ? 'bg-yellow-400/20 text-yellow-400'
-                : 'hover:bg-gray-800 text-gray-400'
+                ? "bg-yellow-400/20 text-yellow-400"
+                : "hover:bg-gray-800 text-gray-400"
             }`}
           >
-            <Bookmark
-              size={18}
-              className={saved ? 'fill-yellow-400' : ''}
-            />
+            <Bookmark size={18} className={saved ? "fill-yellow-400" : ""} />
           </button>
         </div>
 
         {showComments && post.comments.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-800 space-y-4">
             <h4 className="font-semibold text-white text-sm">
-              {post.type === 'question' ? 'Answers' : 'Comments'} ({post.comments.length})
+              {post.type === "question" ? "Answers" : "Comments"} (
+              {post.comments.length})
             </h4>
             {post.comments.slice(0, 3).map((comment) => (
               <div key={comment._id} className="flex gap-3">
@@ -252,9 +283,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                       <span className="font-semibold text-white text-xs sm:text-sm">
                         {comment.author.name}
                       </span>
-                      <span className="text-xs text-gray-500">{comment.author.username}</span>
+                      <span className="text-xs text-gray-500">
+                        {comment.author.username}
+                      </span>
                     </div>
-                    <p className="text-gray-200 text-xs sm:text-sm">{comment.content}</p>
+                    <p className="text-gray-200 text-xs sm:text-sm">
+                      {comment.content}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 px-3">
                     <button className="flex items-center gap-1 text-gray-500 hover:text-red-400 transition text-xs">
@@ -264,14 +299,17 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                     <button className="text-gray-500 hover:text-gray-300 transition text-xs">
                       Reply
                     </button>
-                    <span className="text-gray-600 text-xs">{formatTime(comment.createdAt)}</span>
+                    <span className="text-gray-600 text-xs">
+                      {formatTime(comment.createdAt)}
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
             {post.comments.length > 3 && (
               <button className="text-yellow-400 hover:text-yellow-300 font-medium text-sm transition">
-                View all {post.comments.length} {post.type === 'question' ? 'answers' : 'comments'}
+                View all {post.comments.length}{" "}
+                {post.type === "question" ? "answers" : "comments"}
               </button>
             )}
           </div>
