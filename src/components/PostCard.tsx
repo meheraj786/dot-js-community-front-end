@@ -8,27 +8,29 @@ import {
   Code,
   CheckCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import {
   useIsLikedQuery,
   useLikePostMutation,
   useLikesCountQuery,
 } from "../services/postApi";
+import { useCreateCommentMutation } from "../services/commentApi";
 
 type PostType = "thought" | "question";
 
 interface User {
   _id: string;
   name: string;
-  username: string;
+  username?: string;
   avatar?: string;
   verified?: boolean;
 }
 
 interface Comment {
   _id: string;
-  author: User;
+  author: string | User;
   content: string;
-  likes: string[];
+  likes?: string[];
   createdAt: string;
 }
 
@@ -44,22 +46,27 @@ export interface Post {
   comments: Comment[];
   createdAt: string;
   updatedAt: string;
+  likesCount?: number;
 }
 
 interface PostCardProps {
   post: Post;
   currentUserId?: string;
+  currentUser?: User;
 }
 
-export default function PostCard({ post, currentUserId }: PostCardProps) {
+export default function PostCard({ post, currentUserId, currentUser }: PostCardProps) {
   const [liked, setLiked] = useState<boolean>(
     currentUserId ? post.likes.includes(currentUserId) : false
   );
   const [likeCount, setLikeCount] = useState<number>(post.likes.length);
   const [saved, setSaved] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
-  const [showCodeBlock, setShowCodeBlock] = useState<boolean>(false);
+  const [showCodeBlock, setShowCodeBlock] = useState<boolean>(true);
+  const [commentText, setCommentText] = useState<string>('');
+  
   const [likePost] = useLikePostMutation();
+  const [createComment, { isLoading: isSubmitting }] = useCreateCommentMutation();
   const { data, error, isLoading, isError } = useLikesCountQuery(post?._id);
   const {
     data: isLiked,
@@ -71,7 +78,29 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const handleLike = () => {
     likePost(post?._id);
   };
-  console.log(data, "Likes count");
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    console.log(commentText, currentUserId);
+    
+    e.preventDefault();
+    if (!commentText.trim() || !currentUserId) {
+      toast.error('Please write something');
+      return;
+    }
+
+    try {
+      await createComment({ 
+        newPost: { content: commentText },
+        id: post._id 
+      }).unwrap();
+      
+      toast.success(post.type === "question" ? 'Answer posted!' : 'Opinion posted!');
+      setCommentText('');
+    } catch (error) {
+      console.error('Failed to post comment:', error);
+      toast.error('Failed to post comment');
+    }
+  };
 
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
@@ -93,9 +122,29 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     return num.toString();
   };
 
-  const getAvatarUrl = (avatar?: string): string => {
+  const getAvatarUrl = (avatar?: string, username?: string): string => {
     if (avatar) return avatar;
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.username}`;
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${username || 'user'}`;
+  };
+
+  const getCommentAuthorName = (author: string | User): string => {
+    if (typeof author === 'string') {
+      if (currentUser && author === currentUserId) {
+        return currentUser.name;
+      }
+      return post.author.name;
+    }
+    return author.name || author.username || 'Anonymous';
+  };
+
+  const getCommentAuthorAvatar = (author: string | User): string => {
+    if (typeof author === 'string') {
+      if (currentUser && author === currentUserId) {
+        return getAvatarUrl(currentUser.avatar, currentUser.username);
+      }
+      return getAvatarUrl(post.author.avatar, post.author.username);
+    }
+    return getAvatarUrl(author.avatar, author.username);
   };
 
   const isAnswered = post.type === "question" && post.comments.length > 0;
@@ -106,7 +155,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3">
             <img
-              src={getAvatarUrl(post.author.avatar)}
+              src={getAvatarUrl(post.author.avatar, post.author.username)}
               alt={post.author.name}
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-700"
             />
@@ -122,9 +171,11 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   />
                 )}
               </div>
-              <p className="text-xs sm:text-sm text-gray-400">
-                {post.author.username}
-              </p>
+              {post.author.username && (
+                <p className="text-xs sm:text-sm text-gray-400">
+                  @{post.author.username}
+                </p>
+              )}
               <p className="text-xs text-gray-500">
                 {formatTime(post.createdAt)}
               </p>
@@ -198,7 +249,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 <div className="bg-black rounded-lg p-3 sm:p-4 overflow-x-auto border border-gray-800 custom-scrollbar">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-yellow-400 text-xs font-semibold uppercase">
-                      Code
+                      JavaScript
                     </span>
                     <button
                       onClick={() =>
@@ -228,9 +279,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   : "hover:bg-gray-800 text-gray-400"
               }`}
             >
-              <Heart size={18} className={liked ? "fill-red-400" : ""} />
+              <Heart 
+                size={18} 
+                className={isLiked?.isLiked ? "fill-red-400" : ""} 
+              />
               <span className="text-xs sm:text-sm font-medium">
-                {isLoading ? "..." : data?.likesCount ?? 0}
+                {isLoading ? "..." : data?.likesCount ?? post.likesCount ?? 0}
               </span>
             </button>
 
@@ -264,53 +318,97 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           </button>
         </div>
 
-        {showComments && post.comments.length > 0 && (
+        {showComments && (
           <div className="mt-4 pt-4 border-t border-gray-800 space-y-4">
-            <h4 className="font-semibold text-white text-sm">
-              {post.type === "question" ? "Answers" : "Comments"} (
-              {post.comments.length})
-            </h4>
-            {post.comments.slice(0, 3).map((comment) => (
-              <div key={comment._id} className="flex gap-3">
-                <img
-                  src={getAvatarUrl(comment.author.avatar)}
-                  alt={comment.author.name}
-                  className="w-8 h-8 rounded-full border border-gray-700"
-                />
-                <div className="flex-1">
-                  <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-xs sm:text-sm">
-                        {comment.author.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {comment.author.username}
-                      </span>
+            {currentUser ? (
+              <form onSubmit={handleCommentSubmit} className="mb-4">
+                <div className="flex gap-3">
+                  <img
+                    src={getAvatarUrl(currentUser.avatar, currentUser.username)}
+                    alt={currentUser.name}
+                    className="w-8 h-8 rounded-full border border-gray-700 flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <textarea
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder={post.type === "question" ? "Write your answer..." : "Share your opinion..."}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent resize-none"
+                      rows={3}
+                      disabled={isSubmitting}
+                    />
+                    <div className="flex justify-end mt-2">
+                      <button
+                        type="submit"
+                        disabled={!commentText.trim() || isSubmitting}
+                        className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg font-semibold text-sm hover:bg-yellow-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? 'Posting...' : (post.type === "question" ? 'Post Answer' : 'Post Opinion')}
+                      </button>
                     </div>
-                    <p className="text-gray-200 text-xs sm:text-sm">
-                      {comment.content}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 px-3">
-                    <button className="flex items-center gap-1 text-gray-500 hover:text-red-400 transition text-xs">
-                      <Heart size={14} />
-                      <span>{comment.likes.length}</span>
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-300 transition text-xs">
-                      Reply
-                    </button>
-                    <span className="text-gray-600 text-xs">
-                      {formatTime(comment.createdAt)}
-                    </span>
                   </div>
                 </div>
+              </form>
+            ) : (
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+                <p className="text-gray-400 text-sm">
+                  Please login to {post.type === "question" ? "answer" : "share your opinion"}
+                </p>
               </div>
-            ))}
-            {post.comments.length > 3 && (
-              <button className="text-yellow-400 hover:text-yellow-300 font-medium text-sm transition">
-                View all {post.comments.length}{" "}
-                {post.type === "question" ? "answers" : "comments"}
-              </button>
+            )}
+
+            {post.comments.length > 0 && (
+              <>
+                <h4 className="font-semibold text-white text-sm">
+                  {post.type === "question" ? "Answers" : "Opinions"} (
+                  {post.comments.length})
+                </h4>
+                {post.comments.slice(0, 3).map((comment) => (
+                  <div key={comment._id} className="flex gap-3">
+                    <img
+                      src={getCommentAuthorAvatar(comment.author)}
+                      alt={getCommentAuthorName(comment.author)}
+                      className="w-8 h-8 rounded-full border border-gray-700 flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-white text-xs sm:text-sm">
+                            {getCommentAuthorName(comment.author)}
+                          </span>
+                          {typeof comment.author !== 'string' && comment.author.verified && (
+                            <CheckCircle
+                              className="text-yellow-400 fill-yellow-400"
+                              size={12}
+                            />
+                          )}
+                        </div>
+                        <p className="text-gray-200 text-xs sm:text-sm">
+                          {comment.content}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 mt-2 px-3">
+                        <button className="flex items-center gap-1 text-gray-500 hover:text-red-400 transition text-xs">
+                          <Heart size={14} />
+                          <span>{comment.likes?.length || 0}</span>
+                        </button>
+                        <button className="text-gray-500 hover:text-gray-300 transition text-xs">
+                          Reply
+                        </button>
+                        <span className="text-gray-600 text-xs">
+                          {formatTime(comment.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {post.comments.length > 3 && (
+                  <button className="text-yellow-400 hover:text-yellow-300 font-medium text-sm transition">
+                    View all {post.comments.length}{" "}
+                    {post.type === "question" ? "answers" : "opinions"}
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}

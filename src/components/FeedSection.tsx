@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { Clock, Star, TrendingUp } from "lucide-react";
 import PostCard from "./PostCard";
 import { useGetPostsQuery } from "../services/postApi";
+import { useGetUserQuery } from "../services/userApi";
 
 export default function FeedSection() {
-  const { data, isLoading, isError, error } = useGetPostsQuery(undefined, {pollingInterval: 60000});
+  const { data, isLoading, isError, error } = useGetPostsQuery(undefined, {
+    pollingInterval: 60000,
+  });
+  const { data: user } = useGetUserQuery();
   console.log(data);
 
   type SortType = "latest" | "trending" | "top";
@@ -15,7 +19,6 @@ export default function FeedSection() {
     { value: "trending" as SortType, label: "Trending", icon: TrendingUp },
     { value: "top" as SortType, label: "Top", icon: Star },
   ];
-
 
   return (
     <div className="min-h-screen bg-primary">
@@ -46,7 +49,12 @@ export default function FeedSection() {
         {/* Posts Feed */}
         <div className="space-y-4">
           {data?.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUser={user}
+              currentUserId={user?.data?._id}
+            />
           ))}
         </div>
 
