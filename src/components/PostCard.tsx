@@ -326,7 +326,7 @@ export default function PostCard({ post, currentUserId, currentUser }: PostCardP
                   <img
                     src={getAvatarUrl(currentUser.avatar, currentUser.username)}
                     alt={currentUser.name}
-                    className="w-8 h-8 rounded-full border border-gray-700 flex-shrink-0"
+                    className="w-8 h-8 rounded-full border border-gray-700 shrink-0"
                   />
                   <div className="flex-1">
                     <textarea
@@ -368,7 +368,7 @@ export default function PostCard({ post, currentUserId, currentUser }: PostCardP
                     <img
                       src={getCommentAuthorAvatar(comment.author)}
                       alt={getCommentAuthorName(comment.author)}
-                      className="w-8 h-8 rounded-full border border-gray-700 flex-shrink-0"
+                      className="w-8 h-8 rounded-full border border-gray-700 shrink-0"
                     />
                     <div className="flex-1">
                       <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">

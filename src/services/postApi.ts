@@ -29,6 +29,21 @@ export const postApi = api.injectEndpoints({
       query: (postId) => `/post/is-liked/${postId}`,
       providesTags: ["Likes"],
     }),
+    getTrendingTopics: builder.query({
+      query: (params?: { limit?: number; days?: number }) => ({
+        url: "/post/trending-topics",
+        params,
+      }),
+      providesTags: ["Post"],
+    }),
+
+    getPostsByTag: builder.query({
+      query: ({ tag, page = 1, limit = 20 }) => ({
+        url: `/post/tag/${tag}`,
+        params: { page, limit },
+      }),
+      providesTags: ["Post"],
+    }),
   }),
 });
 
@@ -37,5 +52,5 @@ export const {
   useGetPostsQuery,
   useLikePostMutation,
   useLikesCountQuery,
-  useIsLikedQuery
+  useIsLikedQuery,
 } = postApi;
