@@ -6,10 +6,6 @@ export const postApi = api.injectEndpoints({
       query: () => "/post/posts",
       providesTags: ["Post"],
     }),
-    getTrendingTopics: builder.query({
-      query: () => "/post/trending-topics",
-      providesTags: ["Post"],
-    }),
     createPost: builder.mutation({
       query: (newPost) => ({
         url: "/post/create",
@@ -57,4 +53,6 @@ export const {
   useLikePostMutation,
   useLikesCountQuery,
   useIsLikedQuery,
+  useGetPostsByTagQuery,
+  useGetTrendingTopicsQuery
 } = postApi;

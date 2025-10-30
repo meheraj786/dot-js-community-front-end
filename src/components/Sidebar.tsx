@@ -1,5 +1,16 @@
-import { useState } from 'react';
-import { Home, Code, Users, Bookmark, TrendingUp, Hash, ChevronRight, Flame, Sparkles } from 'lucide-react';
+import { useState } from "react";
+import {
+  Home,
+  Code,
+  Users,
+  Bookmark,
+  TrendingUp,
+  Hash,
+  ChevronRight,
+  Flame,
+  Sparkles,
+} from "lucide-react";
+import { useGetTrendingTopicsQuery } from "../services/postApi";
 
 interface NavItem {
   icon: any;
@@ -21,48 +32,50 @@ interface SuggestedUser {
 }
 
 export default function Sidebar() {
-  const [activeNav, setActiveNav] = useState<string>('home');
+  const [activeNav, setActiveNav] = useState<string>("home");
 
   const mainNavItems: NavItem[] = [
-    { icon: Home, label: 'Home', href: 'home' },
-    { icon: Code, label: 'Code Blocks', href: 'code' },
-    { icon: Users, label: 'Community', href: 'community' },
-    { icon: Bookmark, label: 'Saved', href: 'saved', count: 12 },
-    { icon: TrendingUp, label: 'Trending', href: 'trending' },
+    { icon: Home, label: "Home", href: "home" },
+    { icon: Code, label: "Code Blocks", href: "code" },
+    { icon: Users, label: "Community", href: "community" },
+    { icon: Bookmark, label: "Saved", href: "saved", count: 12 },
+    { icon: TrendingUp, label: "Trending", href: "trending" },
   ];
+  const { data: trendingTopics } = useGetTrendingTopicsQuery(undefined);
+console.log(trendingTopics);
 
-  const trendingTopics: TrendingTopic[] = [
-    { tag: 'react19', posts: 1234 },
-    { tag: 'typescript', posts: 892 },
-    { tag: 'nextjs', posts: 756 },
-    { tag: 'webdev', posts: 645 },
-    { tag: 'javascript', posts: 523 },
-  ];
+  // const trendingTopics: TrendingTopic[] = [
+  //   { tag: 'react19', posts: 1234 },
+  //   { tag: 'typescript', posts: 892 },
+  //   { tag: 'nextjs', posts: 756 },
+  //   { tag: 'webdev', posts: 645 },
+  //   { tag: 'javascript', posts: 523 },
+  // ];
 
   const suggestedUsers: SuggestedUser[] = [
     {
-      name: 'Sarah Chen',
-      username: '@sarahchen',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-      followers: 12500
+      name: "Sarah Chen",
+      username: "@sarahchen",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+      followers: 12500,
     },
     {
-      name: 'Mike Johnson',
-      username: '@mikej',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike',
-      followers: 8900
+      name: "Mike Johnson",
+      username: "@mikej",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
+      followers: 8900,
     },
     {
-      name: 'Alex Rodriguez',
-      username: '@alexr',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
-      followers: 6700
+      name: "Alex Rodriguez",
+      username: "@alexr",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+      followers: 6700,
     },
   ];
 
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return (num / 1000).toFixed(1) + "K";
     }
     return num.toString();
   };
@@ -78,8 +91,8 @@ export default function Sidebar() {
               onClick={() => setActiveNav(item.href)}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition group ${
                 activeNav === item.href
-                  ? 'bg-yellow-400 text-black font-semibold'
-                  : 'text-gray-300 hover:bg-gray-900 hover:text-white'
+                  ? "bg-yellow-400 text-black font-semibold"
+                  : "text-gray-300 hover:bg-gray-900 hover:text-white"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -90,8 +103,8 @@ export default function Sidebar() {
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${
                     activeNav === item.href
-                      ? 'bg-black text-yellow-400'
-                      : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700'
+                      ? "bg-black text-yellow-400"
+                      : "bg-gray-800 text-gray-400 group-hover:bg-gray-700"
                   }`}
                 >
                   {item.count}
@@ -105,16 +118,20 @@ export default function Sidebar() {
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <div className="flex items-center gap-2 mb-4">
             <Flame className="text-yellow-400" size={20} />
-            <h3 className="text-white font-bold text-sm lg:text-base">Trending Topics</h3>
+            <h3 className="text-white font-bold text-sm lg:text-base">
+              Trending Topics
+            </h3>
           </div>
           <div className="space-y-3">
-            {trendingTopics.map((topic, index) => (
+            {trendingTopics?.slice(0,4).map((topic, index:number) => (
               <button
                 key={topic.tag}
                 className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-gray-800 transition group"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-yellow-400 font-bold text-sm">#{index + 1}</span>
+                  <span className="text-yellow-400 font-bold text-sm">
+                    #{index + 1}
+                  </span>
                   <div className="flex items-center gap-1.5">
                     <Hash size={14} className="text-gray-500" />
                     <span className="text-white text-sm font-medium group-hover:text-yellow-400 transition">
@@ -122,7 +139,9 @@ export default function Sidebar() {
                     </span>
                   </div>
                 </div>
-                <span className="text-xs text-gray-500">{formatNumber(topic.posts)} posts</span>
+                <span className="text-xs text-gray-500">
+                  {topic.postsCount} posts
+                </span>
               </button>
             ))}
           </div>
@@ -136,7 +155,9 @@ export default function Sidebar() {
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="text-yellow-400" size={20} />
-            <h3 className="text-white font-bold text-sm lg:text-base">Suggested for You</h3>
+            <h3 className="text-white font-bold text-sm lg:text-base">
+              Suggested for You
+            </h3>
           </div>
           <div className="space-y-3">
             {suggestedUsers.map((user) => (
@@ -151,9 +172,13 @@ export default function Sidebar() {
                     className="w-10 h-10 rounded-full border-2 border-gray-700"
                   />
                   <div>
-                    <p className="text-white text-sm font-medium">{user.name}</p>
+                    <p className="text-white text-sm font-medium">
+                      {user.name}
+                    </p>
                     <p className="text-gray-500 text-xs">{user.username}</p>
-                    <p className="text-gray-600 text-xs">{formatNumber(user.followers)} followers</p>
+                    <p className="text-gray-600 text-xs">
+                      {formatNumber(user.followers)} followers
+                    </p>
                   </div>
                 </div>
                 <button className="px-3 py-1.5 bg-yellow-400 text-black text-xs font-semibold rounded-lg hover:bg-yellow-500 transition">
@@ -170,7 +195,9 @@ export default function Sidebar() {
 
         {/* Quick Stats */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-          <h3 className="text-white font-bold text-sm lg:text-base mb-3">Your Stats</h3>
+          <h3 className="text-white font-bold text-sm lg:text-base mb-3">
+            Your Stats
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-sm">Posts</span>
@@ -194,13 +221,21 @@ export default function Sidebar() {
         {/* Footer Links */}
         <div className="text-center space-y-2 pb-4">
           <div className="flex flex-wrap justify-center gap-2 text-xs text-gray-500">
-            <a href="#about" className="hover:text-yellow-400 transition">About</a>
+            <a href="#about" className="hover:text-yellow-400 transition">
+              About
+            </a>
             <span>•</span>
-            <a href="#help" className="hover:text-yellow-400 transition">Help</a>
+            <a href="#help" className="hover:text-yellow-400 transition">
+              Help
+            </a>
             <span>•</span>
-            <a href="#terms" className="hover:text-yellow-400 transition">Terms</a>
+            <a href="#terms" className="hover:text-yellow-400 transition">
+              Terms
+            </a>
             <span>•</span>
-            <a href="#privacy" className="hover:text-yellow-400 transition">Privacy</a>
+            <a href="#privacy" className="hover:text-yellow-400 transition">
+              Privacy
+            </a>
           </div>
           <p className="text-xs text-gray-600">© 2025 JS Community</p>
         </div>
