@@ -3,7 +3,7 @@ import { api } from "./api";
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
-      query: () => "/users",
+      query: () => "auth/get-users",
       providesTags: ["User"],
     }),
     getUser: builder.query({
@@ -11,7 +11,7 @@ export const userApi = api.injectEndpoints({
     }),
 
     getUserById: builder.query({
-      query: (id) => `/users/${id}`,
+      query: (id) => `/auth/${id}`,
       providesTags: ["User"],
     }),
     loginUser: builder.mutation({
@@ -37,7 +37,7 @@ export const userApi = api.injectEndpoints({
     }),
     updateUser: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/users/${id}`,
+        url: `/auth/${id}`,
         method: "PATCH",
         body: data,
       }),
@@ -45,7 +45,7 @@ export const userApi = api.injectEndpoints({
     }),
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `/users/${id}`,
+        url: `/auth/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
@@ -61,5 +61,5 @@ export const {
   useUpdateUserMutation,
   useDeleteUserMutation,
   useLoginUserMutation,
-  useGetUserQuery
+  useGetUserQuery,
 } = userApi;

@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useGetTrendingTopicsQuery } from "../services/postApi";
+import { useGetUsersQuery } from "../services/userApi";
 
 interface NavItem {
   icon: any;
@@ -42,7 +43,8 @@ export default function Sidebar() {
     { icon: TrendingUp, label: "Trending", href: "trending" },
   ];
   const { data: trendingTopics } = useGetTrendingTopicsQuery(undefined);
-console.log(trendingTopics);
+  const { data: suggestedUsers } = useGetUsersQuery(undefined);
+  console.log(suggestedUsers);
 
   // const trendingTopics: TrendingTopic[] = [
   //   { tag: 'react19', posts: 1234 },
@@ -52,26 +54,26 @@ console.log(trendingTopics);
   //   { tag: 'javascript', posts: 523 },
   // ];
 
-  const suggestedUsers: SuggestedUser[] = [
-    {
-      name: "Sarah Chen",
-      username: "@sarahchen",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-      followers: 12500,
-    },
-    {
-      name: "Mike Johnson",
-      username: "@mikej",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-      followers: 8900,
-    },
-    {
-      name: "Alex Rodriguez",
-      username: "@alexr",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-      followers: 6700,
-    },
-  ];
+  // const suggestedUsers: SuggestedUser[] = [
+  //   {
+  //     name: "Sarah Chen",
+  //     username: "@sarahchen",
+  //     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+  //     followers: 12500,
+  //   },
+  //   {
+  //     name: "Mike Johnson",
+  //     username: "@mikej",
+  //     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
+  //     followers: 8900,
+  //   },
+  //   {
+  //     name: "Alex Rodriguez",
+  //     username: "@alexr",
+  //     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+  //     followers: 6700,
+  //   },
+  // ];
 
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
@@ -123,7 +125,7 @@ console.log(trendingTopics);
             </h3>
           </div>
           <div className="space-y-3">
-            {trendingTopics?.slice(0,4).map((topic, index:number) => (
+            {trendingTopics?.slice(0, 4).map((topic, index: number) => (
               <button
                 key={topic.tag}
                 className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-gray-800 transition group"
@@ -160,24 +162,24 @@ console.log(trendingTopics);
             </h3>
           </div>
           <div className="space-y-3">
-            {suggestedUsers.map((user) => (
+            {suggestedUsers?.data?.slice(0, 4).map((user) => (
               <div
-                key={user.username}
+                key={user?.email}
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800 transition"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center w-[80%] gap-3">
                   <img
-                    src={user.avatar}
-                    alt={user.name}
+                    src={user?.avatar}
+                    alt={user?.name}
                     className="w-10 h-10 rounded-full border-2 border-gray-700"
                   />
                   <div>
                     <p className="text-white text-sm font-medium">
-                      {user.name}
+                      {user?.name}
                     </p>
-                    <p className="text-gray-500 text-xs">{user.username}</p>
+                    <p className="text-gray-500 truncate w-[80%] text-xs">{user?.email}</p>
                     <p className="text-gray-600 text-xs">
-                      {formatNumber(user.followers)} followers
+                      {formatNumber(user?.followers)} followers
                     </p>
                   </div>
                 </div>
