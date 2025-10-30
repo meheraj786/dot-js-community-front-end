@@ -21,8 +21,14 @@ export default function PostCreator() {
   const [tags, setTags] = useState<string>("");
   const [showCodeInput, setShowCodeInput] = useState<boolean>(false);
   const [codeBlock, setCodeBlock] = useState<string>("");
-  const [image, setImage] = useState<string>("");
   const [showImageInput, setShowImageInput] = useState<boolean>(false);
+  const [image, setImage] = useState<File | null | string>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   useEffect(() => {
     if (postType !== null) {
@@ -36,7 +42,7 @@ export default function PostCreator() {
     setContent("");
     setTags("");
     setCodeBlock("");
-    setImage("");
+    setImage(null);
     setShowTagInput(false);
     setShowCodeInput(false);
     setShowImageInput(false);
@@ -53,17 +59,16 @@ export default function PostCreator() {
       .map((t) => t.trim())
       .filter((t) => t);
 
-    const postData = {
-      type: postType,
-      content: content.trim(),
-      ...(codeBlock.trim() && { codeBlock: codeBlock.trim() }),
-      tags: tagArray,
-      ...(image.trim() && { image: image.trim() }),
-    };
+    const formData = new FormData();
+    formData.append("type", postType);
+    formData.append("content", content.trim());
+    formData.append("tags", JSON.stringify(tagArray));
+
+    if (codeBlock.trim()) formData.append("codeBlock", codeBlock.trim());
+    if (image) formData.append("image", image);
 
     try {
-      await createPost(postData).unwrap();
-
+      await createPost(formData).unwrap();
       resetForm();
       toast.success("Post created successfully!");
     } catch (error: any) {
@@ -261,26 +266,24 @@ export default function PostCreator() {
             {showImageInput && (
               <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 space-y-3">
                 <label className="block text-sm font-medium text-gray-300">
-                  Image URL
+                  Upload Image
                 </label>
                 <input
-                  type="text"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white placeholder:text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition text-sm sm:text-base"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition text-sm sm:text-base"
                 />
-                <p className="text-xs text-gray-400">Enter a valid image URL</p>
+                <p className="text-xs text-gray-400">
+                  Upload a valid image (PNG, JPG, etc.)
+                </p>
+
                 {image && (
                   <div className="mt-3">
                     <img
-                      src={image}
+                      src={URL.createObjectURL(image)}
                       alt="Preview"
                       className="w-full max-h-64 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "https://via.placeholder.com/400x300?text=Invalid+Image";
-                      }}
                     />
                   </div>
                 )}

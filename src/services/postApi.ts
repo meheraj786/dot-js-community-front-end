@@ -7,13 +7,14 @@ export const postApi = api.injectEndpoints({
       providesTags: ["Post"],
     }),
     createPost: builder.mutation({
-      query: (newPost) => ({
+      query: (formData) => ({
         url: "/post/create",
         method: "POST",
-        body: newPost,
+        body: formData,
       }),
       invalidatesTags: ["Post"],
     }),
+
     likePost: builder.mutation({
       query: (postId) => ({
         url: `/post/like/${postId}`,
@@ -54,5 +55,5 @@ export const {
   useLikesCountQuery,
   useIsLikedQuery,
   useGetPostsByTagQuery,
-  useGetTrendingTopicsQuery
+  useGetTrendingTopicsQuery,
 } = postApi;

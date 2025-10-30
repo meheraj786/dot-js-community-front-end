@@ -3,9 +3,10 @@ import { Clock, Star, TrendingUp } from "lucide-react";
 import PostCard from "./PostCard";
 import { useGetPostsQuery } from "../services/postApi";
 import { useGetUserQuery } from "../services/userApi";
+import PostCardSkeleton from "./PostCardSkeleton";
 
 export default function FeedSection() {
-  const { data, isLoading, isError, error } = useGetPostsQuery(undefined, {
+  const { data, isLoading } = useGetPostsQuery(undefined, {
     pollingInterval: 60000,
   });
   const { data: user } = useGetUserQuery();
@@ -47,6 +48,13 @@ export default function FeedSection() {
         </div>
 
         {/* Posts Feed */}
+        {isLoading && (
+          <div className="space-y-4">
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+          </div>
+        )}
         <div className="space-y-4">
           {data?.map((post) => (
             <PostCard
@@ -59,11 +67,11 @@ export default function FeedSection() {
         </div>
 
         {/* Load More */}
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <button className="px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition border border-gray-800">
             Load More Posts
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
