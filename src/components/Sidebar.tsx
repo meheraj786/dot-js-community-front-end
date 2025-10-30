@@ -10,7 +10,7 @@ interface NavItem {
 
 interface TrendingTopic {
   tag: string;
-  posts: number;
+  posts?: number;
 }
 
 interface SuggestedUser {
