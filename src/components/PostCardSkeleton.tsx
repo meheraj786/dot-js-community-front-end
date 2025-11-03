@@ -12,6 +12,7 @@ export default function PostCardSkeleton() {
               <div className="w-20 h-2 bg-gray-800 rounded" />
             </div>
           </div>
+
           <div className="flex items-center gap-2">
             <div className="w-20 h-6 bg-gray-800 rounded-full" />
             <div className="w-16 h-6 bg-gray-800 rounded-full" />
